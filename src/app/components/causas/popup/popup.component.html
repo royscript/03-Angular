@@ -1,21 +1,26 @@
-<div class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<button (click)="mostrar()" class="btn btn-danger btn-sm">
+  <i class="bi bi-trash"></i>
+</button>
+<ng-container *ngIf="mostrarPopUp">
+  <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;">
+    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Popup</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <h5 class="modal-title">{{ titulo }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cerrar()">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <!-- Contenido del popup -->
-          <p>Hola, este es un popup de ejemplo.</p>
+          <p>{{ contenido }}</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-          <button type="button" class="btn btn-primary">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cerrar()">Cerrar</button>
+          <button type="button" class="btn btn-primary" (click)="ok()">{{ txtOk }}</button>
         </div>
       </div>
     </div>
   </div>
-  
+  <div class="modal-backdrop fade show"></div>
+</ng-container>
+

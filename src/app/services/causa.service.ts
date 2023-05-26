@@ -20,7 +20,6 @@ export class CausaService {
     return this.http.post<Causa>(`${this.url}causa`, causa, this.httpOptions);
   }
   editar(causa: Causa): Observable<Causa> {
-    console.log(causa);
     return this.http.put<Causa>(`${this.url}causa/${causa.id}`, causa, this.httpOptions);
   }
 

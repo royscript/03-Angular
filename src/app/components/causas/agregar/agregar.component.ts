@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, Validators, FormGroup, FormBuilder } from '@angular/forms'; /* Formularios Reactivos */
 import { Causa } from 'src/app/models/causa.model';
@@ -13,9 +13,11 @@ export class AgregarComponent implements OnInit {
   titulo?:string;
   causaEditar?:Causa;
   causa?:Causa;
+  //----------Definicion del formulario y validaciones
   causaForm = this._fb.group({
     nombre : [this.causa && this.causa.nombre || null, [Validators.required, Validators.minLength(7)]]
   })
+  errors:any;
   constructor(
       private _fb : FormBuilder,
       private causaService  : CausaService,
@@ -25,14 +27,16 @@ export class AgregarComponent implements OnInit {
   }
   //-------Funciones ciclo de vida
   ngOnInit() {
-    this.causaEditar = history.state.causaEditar;
-    if(typeof this.causaEditar !== 'undefined'){
-      this.titulo = 'Editar Causa';
-      this.causaForm.patchValue({
+    this.causaEditar = history.state.causaEditar;/* Recepcionamos los datos del usuario en caso de editar */
+    if(typeof this.causaEditar !== 'undefined'){/* Si se encuentra la causa con datos */
+      this.titulo = 'Editar Causa';/* Cambiamos el nombre del encabezado */
+      this.causaForm.patchValue({/* Asignamos al formulario el nombre de la causa a editar */
         nombre: this.causaEditar.nombre
       });
+      // Limpiar los valores en el historial de navegación
+      history.replaceState({ ...history.state, causaEditar: null }, '');
     }else{
-      this.titulo = 'Agregar Causa';
+      this.titulo = 'Agregar Causa';/* En caso contrario es agregar */
     }
   }
   //-------metodos del componente
@@ -41,27 +45,31 @@ export class AgregarComponent implements OnInit {
   }
 
   onSubmit(value : FormGroup){
-    console.log(value.value);
-    if(typeof this.causaEditar !== 'undefined'){
+    if(typeof this.causaEditar !== 'undefined'){/* Si existe una causa para editar  */
       //Editar
       //Agregamos los campos faltantes al objeto y enviamos
       let c = { ...this.causaEditar, ...value.value  };
       value.status === 'VALID' ?
         this.causaService.editar(c).subscribe(data=>{
-          console.log("Editado",data);
           if(data){
-            this.router.navigateByUrl('.../listar');
+            this.router.navigate(['/causas/listar'], { state: { success: `Causa editada correctamente` } });
           }
+        },
+        error => {
+          this.router.navigate(['/causas/listar'], { state: { errors: `Ocurrió un error al editar la causa: ${error}` } });
         })
       : null;
     }else{
+      /* Si no existe una causa para editar */
       //Guardar
       value.status === 'VALID' ?
         this.causaService.agregar(value.value).subscribe(data=>{
-          console.log("Guardada",data);
           if(data){
-            this.router.navigateByUrl('.../listar');
+            this.router.navigate(['/causas/listar'], { state: { success: `Causa agregada correctamente` } });
           }
+        },
+        error => {
+          this.router.navigate(['/causas/listar'], { state: { errors: `Ocurrió un error al agregar la causa: ${error}` } });
         })
       : null;
     }

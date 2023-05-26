@@ -1,43 +1,63 @@
 <app-navbar titulo="Causas"></app-navbar>
-<ng-container *ngIf="causas | async as $causas">
-    <ng-container *ngIf="$causas && $causas.length > 0; else sinDatos">
-        <div class="container">
-            <div class="row m-4 justify-content-center">
-            <div class="col-8">
-                <div class="d-flex justify-content-end mb-2">
-                    <button class="btn btn-primary btn-square text-center btn-sm" routerLink="../agregar">+ Agregar</button>
-                  </div>
-                <table class="table table-bordered">
-                <thead>
-                    <tr>
-                    <th class="bg-secondary text-white border">Id</th>
-                    <th class="bg-secondary text-white border">Nombre</th>
-                    <th class="bg-secondary text-white border">Fecha de Creación</th>
-                    <th class="bg-secondary text-white border">Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let causa of $causas; index as i;">
-                    <td class="border">#{{causa.id}}</td>
-                    <td class="border">{{causa.nombre}}</td>
-                    <td class="border">{{causa.fechaCreacion}}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" (click)="editar(causa)">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                          
-                        <button class="btn btn-danger btn-sm" (click)="eliminar(causa)">
-                            <i class="bi bi-trash"></i>
-                        </button>                          
-                    </td>
-                    </tr>
-                </tbody>
-                </table>
-            </div>
-            </div>
+<div class="container">
+  <div class="row m-4 justify-content-center">
+    <div class="col-8">
+      <!--- Boton agregar -->
+      <div class="d-flex justify-content-end mb-2">
+        <button class="btn btn-primary btn-square text-center btn-sm" routerLink="../agregar">+ Agregar</button>
+      </div>
+      <!--- /Boton agregar -->
+      <!--- Seccion  manejo de errores, mensajes de exito y cargando -->
+      <ng-container *ngIf="errors">
+        <div [ngClass]="{'d-none': !errors, 'd-block': errors}" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{ errors }}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    </ng-container>
-    <ng-template #sinDatos>
-        <h1>Sin datos...</h1>
-    </ng-template>
-</ng-container>
+      </ng-container>
+      <ng-container *ngIf="success">
+        <div [ngClass]="{'d-none': !success, 'd-block': success}" class="alert alert-success alert-dismissible fade show" role="alert">
+          <strong>{{ success }}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="cargando">
+        <button class="btn btn-primary" type="button" disabled>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando... </button>
+      </ng-container>
+      <!--- /Seccion  manejo de errores, mensajes de exito y cargando -->
+      <!--- Tabla de datos -->
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th class="bg-secondary text-white border">Id</th>
+            <th class="bg-secondary text-white border">Nombre</th>
+            <th class="bg-secondary text-white border">Fecha de Creación</th>
+            <th class="bg-secondary text-white border">Acción</th>
+          </tr>
+        </thead>
+        <ng-container *ngIf="causas | async as $causas">
+          <ng-container *ngIf="$causas && $causas.length > 0; else sinDatos;">
+            <tbody>
+              <tr *ngFor="let causa of $causas; index as i;">
+                <td class="border">#{{causa.id}}</td>
+                <td class="border">{{causa.nombre}}</td>
+                <td class="border">{{causa.fechaCreacion}}</td>
+                <td>
+                  <button class="btn btn-warning btn-sm" (click)="editar(causa)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+          
+                  <app-popup (respuesta)="eliminar($event,causa)" txtOk="Eliminar" titulo="Eliminar" [contenido]="'¿Desea eliminar ' + causa.nombre + '?'" #popup></app-popup>
+                </td>
+              </tr>
+            </tbody>
+          </ng-container>
+          <ng-template #sinDatos>
+            <h1>Sin datos...</h1>
+          </ng-template>
+        </ng-container>
+      </table>
+      <!--- /Tabla de datos -->
+    </div>
+  </div>
+</div>
